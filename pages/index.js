@@ -1,7 +1,9 @@
 import { useState } from "react";
 import ResultCard from "../components/ResultCard";
+import styles from "../styles/Home.module.css";
 
 export default function Home() {
+  const [mode, setMode] = useState("text");
   const [textInput, setTextInput] = useState("");
   const [imageInput, setImageInput] = useState("");
   const [result, setResult] = useState("");
@@ -45,38 +47,94 @@ export default function Home() {
     setLoading(false);
   };
 
+  const useExampleText = () => {
+    setTextInput(
+      "Scientists have discovered a new particle at the LHC that could revolutionize energy production."
+    );
+  };
+
+  const useExampleImage = () => {
+    setImageInput(
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/640px-Fronalpstock_big.jpg"
+    );
+  };
+
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h1>TruthLens</h1>
+    <div className={styles.page}>
+      <header className={styles.hero}>
+        <h1 className={styles.brandTitle}><span className={styles.brandAccent}>Truth</span>Lens</h1>
+        <p className={styles.tagline}>Verify text and images with an intuitive, interactive tool.</p>
+        <div className={styles.tabs} role="tablist" aria-label="Mode selector">
+          <button
+            role="tab"
+            aria-selected={mode === "text"}
+            className={`${styles.tab} ${mode === "text" ? styles.tabActive : ""}`}
+            onClick={() => setMode("text")}
+          >
+            Text
+          </button>
+          <button
+            role="tab"
+            aria-selected={mode === "image"}
+            className={`${styles.tab} ${mode === "image" ? styles.tabActive : ""}`}
+            onClick={() => setMode("image")}
+          >
+            Image
+          </button>
+        </div>
+      </header>
 
-      {/* Text Input */}
-      <textarea
-        rows="4"
-        cols="50"
-        value={textInput}
-        onChange={(e) => setTextInput(e.target.value)}
-        placeholder="Paste text here..."
-      />
-      <br />
-      <button onClick={handleCheckText} disabled={loading}>
-        {loading ? "Checking..." : "Check Text"}
-      </button>
+      <main className={styles.panel}>
+        {mode === "text" ? (
+          <section className={styles.toolCard} aria-labelledby="text-check-label">
+            <label id="text-check-label" className={styles.label}>Paste text</label>
+            <textarea
+              className={styles.textarea}
+              rows={6}
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              placeholder="Paste text here..."
+            />
+            <div className={styles.toolFooter}>
+              <span className={styles.muted}>{textInput.length} chars</span>
+              <div className={styles.actions}>
+                <button className={styles.secondaryBtn} onClick={useExampleText} disabled={loading}>Use example</button>
+                <button className={styles.primaryBtn} onClick={handleCheckText} disabled={loading}>
+                  {loading ? <span className={styles.spinner} aria-hidden /> : "Check Text"}
+                </button>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <section className={styles.toolCard} aria-labelledby="image-check-label">
+            <label id="image-check-label" className={styles.label}>Enter image URL</label>
+            <div className={styles.urlRow}>
+              <input
+                className={styles.urlInput}
+                type="text"
+                value={imageInput}
+                onChange={(e) => setImageInput(e.target.value)}
+                placeholder="Enter image URL..."
+              />
+              <div className={styles.actions}>
+                <button className={styles.secondaryBtn} onClick={useExampleImage} disabled={loading}>Use example</button>
+                <button className={styles.primaryBtn} onClick={handleCheckImage} disabled={loading}>
+                  {loading ? <span className={styles.spinner} aria-hidden /> : "Check Image"}
+                </button>
+              </div>
+            </div>
+            {imageInput ? (
+              <div className={styles.preview}>
+                <img className={styles.previewImg} src={imageInput} alt="Preview" />
+              </div>
+            ) : null}
+          </section>
+        )}
 
-      <hr style={{ margin: "20px 0" }} />
+        <ResultCard result={result} />
+      </main>
 
-      {/* Image Input */}
-      <input
-        type="text"
-        value={imageInput}
-        onChange={(e) => setImageInput(e.target.value)}
-        placeholder="Enter image URL..."
-        style={{ width: "300px" }}
-      />
-      <button onClick={handleCheckImage} disabled={loading}>
-        {loading ? "Checking..." : "Check Image"}
-      </button>
-
-      <ResultCard result={result} />
+      <footer className={styles.footer}>© {new Date().getFullYear()} TruthLens</footer>
     </div>
   );
 }

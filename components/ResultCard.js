@@ -1,16 +1,12 @@
+import styles from "./ResultCard.module.css";
+
 export default function ResultCard({ result }) {
   if (!result) return null;
 
   return (
-    <div style={{
-      border: "1px solid #ddd",
-      borderRadius: "12px",
-      padding: "20px",
-      marginTop: "20px",
-      whiteSpace: "pre-wrap"
-    }}>
-      <h3>Result</h3>
-      <pre>{result}</pre>
+    <div className={styles.resultCard}>
+      <h3 className={styles.resultTitle}>Result</h3>
+      <pre className={styles.resultPre}>{result}</pre>
     </div>
   );
 }
