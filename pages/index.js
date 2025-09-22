@@ -5,7 +5,8 @@ import styles from "../styles/Home.module.css";
 export default function Home() {
   const [mode, setMode] = useState("text");
   const [textInput, setTextInput] = useState("");
-  const [imageInput, setImageInput] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,15 +29,24 @@ export default function Home() {
     setLoading(false);
   };
 
+  const toBase64 = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
   const handleCheckImage = async () => {
-    if (!imageInput) return alert("Enter image URL!");
+    if (!imageFile) return alert("Choose an image first!");
     setLoading(true);
     setResult("");
     try {
+      const dataUrl = await toBase64(imageFile);
+      const base64 = String(dataUrl).split(",").pop();
       const res = await fetch("/api/check-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageUrl: imageInput }),
+        body: JSON.stringify({ imageBase64: base64 }),
       });
       const data = await res.json();
       setResult(JSON.stringify(data, null, 2));
@@ -53,10 +63,25 @@ export default function Home() {
     );
   };
 
-  const useExampleImage = () => {
-    setImageInput(
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/640px-Fronalpstock_big.jpg"
-    );
+  const useExampleImage = async () => {
+    try {
+      const exampleUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/640px-Fronalpstock_big.jpg";
+      const resp = await fetch(exampleUrl);
+      const blob = await resp.blob();
+      const file = new File([blob], "example.jpg", { type: blob.type || "image/jpeg" });
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    } catch (e) {
+      console.error(e);
+      alert("Couldn't load example image.");
+    }
+  };
+
+  const onPickFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   return (
@@ -107,14 +132,13 @@ export default function Home() {
           </section>
         ) : (
           <section className={styles.toolCard} aria-labelledby="image-check-label">
-            <label id="image-check-label" className={styles.label}>Enter image URL</label>
+            <label id="image-check-label" className={styles.label}>Upload an image</label>
             <div className={styles.urlRow}>
               <input
                 className={styles.urlInput}
-                type="text"
-                value={imageInput}
-                onChange={(e) => setImageInput(e.target.value)}
-                placeholder="Enter image URL..."
+                type="file"
+                accept="image/*"
+                onChange={onPickFile}
               />
               <div className={styles.actions}>
                 <button className={styles.secondaryBtn} onClick={useExampleImage} disabled={loading}>Use example</button>
@@ -123,9 +147,14 @@ export default function Home() {
                 </button>
               </div>
             </div>
-            {imageInput ? (
+            {imageFile ? (
+              <div className={styles.toolFooter}>
+                <span className={styles.muted}>{imageFile.name} • {(imageFile.size/1024).toFixed(1)} KB</span>
+              </div>
+            ) : null}
+            {imagePreview ? (
               <div className={styles.preview}>
-                <img className={styles.previewImg} src={imageInput} alt="Preview" />
+                <img className={styles.previewImg} src={imagePreview} alt="Preview" />
               </div>
             ) : null}
           </section>
