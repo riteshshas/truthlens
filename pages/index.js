@@ -49,6 +49,7 @@ export default function Home() {
   };
 
   const handleCheckImage = async () => {
+    if (loading) return;
     if (!imageFile) return alert("Choose an image first!");
     setLoading(true);
     setResult("");
@@ -60,7 +61,9 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageBase64: base64 }),
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch { data = { raw: text }; }
       setResult(JSON.stringify(data, null, 2));
     } catch (err) {
       console.error(err);
