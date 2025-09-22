@@ -8,7 +8,8 @@ export default function Home() {
   const [textInput, setTextInput] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
-  const [result, setResult] = useState("");
+  const [textResult, setTextResult] = useState("");
+  const [imageResult, setImageResult] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleCheckText = async () => {
