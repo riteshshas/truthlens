@@ -1,27 +1,34 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
   try {
-    const { text } = req.body;
+    const apiKey = process.env.AIzaSyBqUxT1I6sT8EJx4YwgV4eHqLhsUQtwq_g;
+    if (!apiKey) {
+      return res.status(500).json({ error: "API key missing!" });
+    }
 
-    const genAI = new GoogleGenerativeAI(process.env.AIzaSyBqUxT1I6sT8EJx4YwgV4eHqLhsUQtwq_g);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const userText = req.body.text;
 
-    const prompt = `Analyze the following news: "${text}".
-    Return:
-    1. Credibility score (0-100).
-    2. A short verdict (Real / Fake / Suspicious).
-    3. 1-line reasoning.`;
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-goog-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: `Check credibility of this text: ${userText}` }],
+            },
+          ],
+        }),
+      }
+    );
 
-    const result = await model.generateContent(prompt);
-    const response = result.response.text();
-
-    res.status(200).json({ output: response });
+    const data = await response.json();
+    res.status(200).json(data);
   } catch (err) {
-    res.status(500).json({ error: "Gemini API failed", details: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong!" });
   }
 }
