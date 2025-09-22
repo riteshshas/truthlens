@@ -43,15 +43,15 @@ export default function Home() {
     if (loading) return;
     if (!imageFile) return alert("Choose an image first!");
     setLoading(true);
-    setResult("");
+    setImageResult("");
     try {
       const dataUrl = await toBase64(imageFile);
       const base64 = String(dataUrl).split(",").pop();
       const { data } = await axios.post("/api/check-image", { imageBase64: base64 });
-      setResult(JSON.stringify(data, null, 2));
+      setImageResult(JSON.stringify(data, null, 2));
     } catch (err) {
       console.error(err);
-      setResult(err?.response?.data?.error || err?.message || "Error occurred!");
+      setImageResult(err?.response?.data?.error || err?.message || "Error occurred!");
     }
     setLoading(false);
   };
