@@ -16,13 +16,13 @@ export default function Home() {
     if (loading) return;
     if (!textInput) return alert("Enter some text!");
     setLoading(true);
-    setResult("");
+    setTextResult("");
     try {
       const { data } = await axios.post("/api/check-text", { text: textInput });
-      setResult(data?.candidates?.[0]?.content?.parts?.[0]?.text || "No result!");
+      setTextResult(data?.candidates?.[0]?.content?.parts?.[0]?.text || "No result!");
     } catch (err) {
       console.error(err);
-      setResult(err?.response?.data?.error || err?.message || "Error occurred!");
+      setTextResult(err?.response?.data?.error || err?.message || "Error occurred!");
     }
     setLoading(false);
   };
