@@ -11,7 +11,7 @@ export default async function handler(req, res) {
       hl: "en",
       gl: "us",
       google_domain: "google.com",
-      api_key: process.env.BING_API_KEY
+      api_key: process.env.c240a05bd656cd59bbcbb142add6d599f8e1708f25250bbe5d9db1cff84bc1e3
     }, (json) => {
       // Top 3 results for simplicity
       const matches = json?.images_results?.slice(0, 3).map(img => ({

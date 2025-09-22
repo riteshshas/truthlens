@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   try {
     const { text } = req.body;
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const genAI = new GoogleGenerativeAI(process.env.AIzaSyBqUxT1I6sT8EJx4YwgV4eHqLhsUQtwq_g);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const prompt = `Analyze the following news: "${text}".
