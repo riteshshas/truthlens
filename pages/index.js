@@ -21,7 +21,7 @@ export default function Home() {
       setResult(data?.candidates?.[0]?.content?.parts?.[0]?.text || "No result!");
     } catch (err) {
       console.error(err);
-      setResult("Error occurred!");
+      setResult(err?.response?.data?.error || err?.message || "Error occurred!");
     }
     setLoading(false);
   };
@@ -50,7 +50,7 @@ export default function Home() {
       setResult(JSON.stringify(data, null, 2));
     } catch (err) {
       console.error(err);
-      setResult("Error occurred!");
+      setResult(err?.response?.data?.error || err?.message || "Error occurred!");
     }
     setLoading(false);
   };
