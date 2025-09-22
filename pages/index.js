@@ -11,6 +11,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const handleCheckText = async () => {
+    if (loading) return;
     if (!textInput) return alert("Enter some text!");
     setLoading(true);
     setResult("");
@@ -20,7 +21,7 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: textInput }),
       });
-      const raw = await res.clone().text();
+      const raw = await res.text();
       let data;
       try {
         data = JSON.parse(raw);
