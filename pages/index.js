@@ -20,8 +20,14 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: textInput }),
       });
-      const data = await res.json();
-      setResult(data?.candidates?.[0]?.content?.parts?.[0]?.text || "No result!");
+      const raw = await res.clone().text();
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        data = { raw };
+      }
+      setResult(data?.candidates?.[0]?.content?.parts?.[0]?.text || data?.raw || "No result!");
     } catch (err) {
       console.error(err);
       setResult("Error occurred!");
