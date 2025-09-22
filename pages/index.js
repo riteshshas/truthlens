@@ -172,7 +172,11 @@ export default function Home() {
           </section>
         )}
 
-        <ResultCard result={result} />
+        {mode === "text" ? (
+          <ResultCard result={textResult} title="Text Result" />
+        ) : (
+          <ResultCard result={imageResult} title="Image Result" />
+        )}
       </main>
 
       <footer className={styles.footer}>© {new Date().getFullYear()} TruthLens</footer>
