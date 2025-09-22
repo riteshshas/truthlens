@@ -65,15 +65,28 @@ export default function Home() {
 
   const useExampleImage = async () => {
     try {
-      const exampleUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/640px-Fronalpstock_big.jpg";
-      const resp = await fetch(exampleUrl);
-      const blob = await resp.blob();
-      const file = new File([blob], "example.jpg", { type: blob.type || "image/jpeg" });
+      const w = 512, h = 320;
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      const grd = ctx.createLinearGradient(0, 0, w, h);
+      grd.addColorStop(0, "#6366f1");
+      grd.addColorStop(1, "#22c55e");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.font = "bold 36px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("Example Image", w / 2, h / 2);
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      if (!blob) return alert("Couldn't create example image.");
+      const file = new File([blob], "example.png", { type: "image/png" });
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
     } catch (e) {
       console.error(e);
-      alert("Couldn't load example image.");
+      alert("Couldn't create example image.");
     }
   };
 
