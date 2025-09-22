@@ -4,8 +4,8 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const apiKey = process.env.SERPAPI_API_KEY;
-    if (!apiKey) return res.status(400).json({ error: "SERPAPI_API_KEY missing. Set it in environment settings." });
+    const apiKey = process.env.SERPAPI_API_KEY || process.env.BING_API_KEY;
+    if (!apiKey) return res.status(400).json({ error: "SERPAPI_API_KEY or BING_API_KEY missing. Set one in environment settings." });
 
     const { imageUrl, imageBase64 } = req.body;
 
