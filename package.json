@@ -10,7 +10,6 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "@google/generative-ai": "latest",
     "axios": "latest",
     "serpapi": "latest"
   }
