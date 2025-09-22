@@ -112,7 +112,7 @@ export default function Home() {
       <main className={styles.panel}>
         {mode === "text" ? (
           <section className={styles.toolCard} aria-labelledby="text-check-label">
-            <label id="text-check-label" className={styles.label}>Paste text</label>
+            <label id="text-check-label" className={styles.label}>Type your text</label>
             <textarea
               className={styles.textarea}
               rows={6}
