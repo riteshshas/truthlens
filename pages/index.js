@@ -2,53 +2,79 @@ import { useState } from "react";
 import ResultCard from "../components/ResultCard";
 
 export default function Home() {
-  const [input, setInput] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [textInput, setTextInput] = useState("");
+  const [imageInput, setImageInput] = useState("");
   const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const checkText = async () => {
-    const res = await fetch("/api/check-text", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: input }),
-    });
-    const data = await res.json();
-    setResult(data.output);
+  const handleCheckText = async () => {
+    if (!textInput) return alert("Enter some text!");
+    setLoading(true);
+    setResult("");
+    try {
+      const res = await fetch("/api/check-text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: textInput }),
+      });
+      const data = await res.json();
+      setResult(data?.candidates?.[0]?.content?.parts?.[0]?.text || "No result!");
+    } catch (err) {
+      console.error(err);
+      setResult("Error occurred!");
+    }
+    setLoading(false);
   };
 
-  const checkImage = async () => {
-  const res = await fetch("/api/check-image", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ imageUrl }),
-  });
-  const data = await res.json();
-  setResult(JSON.stringify(data.foundOn, null, 2));
-};
-
+  const handleCheckImage = async () => {
+    if (!imageInput) return alert("Enter image URL!");
+    setLoading(true);
+    setResult("");
+    try {
+      const res = await fetch("/api/check-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl: imageInput }),
+      });
+      const data = await res.json();
+      setResult(JSON.stringify(data, null, 2));
+    } catch (err) {
+      console.error(err);
+      setResult("Error occurred!");
+    }
+    setLoading(false);
+  };
 
   return (
-    <div style={{ padding: "40px", maxWidth: "600px", margin: "auto" }}>
+    <div style={{ padding: "20px", fontFamily: "Arial" }}>
       <h1>TruthLens</h1>
-      <h3>Fake News & Image Verification</h3>
 
+      {/* Text Input */}
       <textarea
         rows="4"
-        style={{ width: "100%", marginTop: "10px" }}
-        placeholder="Paste news text here..."
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
+        cols="50"
+        value={textInput}
+        onChange={(e) => setTextInput(e.target.value)}
+        placeholder="Paste text here..."
       />
-      <button onClick={checkText}>Check Text</button>
+      <br />
+      <button onClick={handleCheckText} disabled={loading}>
+        {loading ? "Checking..." : "Check Text"}
+      </button>
 
+      <hr style={{ margin: "20px 0" }} />
+
+      {/* Image Input */}
       <input
         type="text"
-        style={{ width: "100%", marginTop: "20px" }}
-        placeholder="Paste image URL here..."
-        value={imageUrl}
-        onChange={(e) => setImageUrl(e.target.value)}
+        value={imageInput}
+        onChange={(e) => setImageInput(e.target.value)}
+        placeholder="Enter image URL..."
+        style={{ width: "300px" }}
       />
-      <button onClick={checkImage}>Check Image</button>
+      <button onClick={handleCheckImage} disabled={loading}>
+        {loading ? "Checking..." : "Check Image"}
+      </button>
 
       <ResultCard result={result} />
     </div>
