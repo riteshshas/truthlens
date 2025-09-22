@@ -1,11 +1,11 @@
 export default async function handler(req, res) {
-  try {
-    const apiKey = process.env.AIzaSyBqUxT1I6sT8EJx4YwgV4eHqLhsUQtwq_g;
-    if (!apiKey) {
-      return res.status(500).json({ error: "API key missing!" });
-    }
+  if (req.method !== "POST") return res.status(405).json({ error: "Only POST allowed" });
 
-    const userText = req.body.text;
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: "API key missing!" });
+
+    const { text } = req.body;
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
@@ -13,14 +13,10 @@ export default async function handler(req, res) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-goog-api-key": apiKey,
+          "X-Goog-Api-Key": apiKey,
         },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: `Check credibility of this text: ${userText}` }],
-            },
-          ],
+          contents: [{ parts: [{ text: `Check credibility: ${text}` }] }],
         }),
       }
     );
@@ -28,7 +24,7 @@ export default async function handler(req, res) {
     const data = await response.json();
     res.status(200).json(data);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Something went wrong!" });
+    console.error("Backend error:", err);
+    res.status(500).json({ error: "Something went wrong" });
   }
 }
