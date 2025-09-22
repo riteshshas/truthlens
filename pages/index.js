@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import ResultCard from "../components/ResultCard";
 import styles from "../styles/Home.module.css";
 
@@ -16,19 +17,8 @@ export default function Home() {
     setLoading(true);
     setResult("");
     try {
-      const res = await fetch("/api/check-text", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: textInput }),
-      });
-      const raw = await res.text();
-      let data;
-      try {
-        data = JSON.parse(raw);
-      } catch {
-        data = { raw };
-      }
-      setResult(data?.candidates?.[0]?.content?.parts?.[0]?.text || data?.raw || "No result!");
+      const { data } = await axios.post("/api/check-text", { text: textInput });
+      setResult(data?.candidates?.[0]?.content?.parts?.[0]?.text || "No result!");
     } catch (err) {
       console.error(err);
       setResult("Error occurred!");
@@ -56,14 +46,7 @@ export default function Home() {
     try {
       const dataUrl = await toBase64(imageFile);
       const base64 = String(dataUrl).split(",").pop();
-      const res = await fetch("/api/check-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64: base64 }),
-      });
-      const text = await res.text();
-      let data;
-      try { data = JSON.parse(text); } catch { data = { raw: text }; }
+      const { data } = await axios.post("/api/check-image", { imageBase64: base64 });
       setResult(JSON.stringify(data, null, 2));
     } catch (err) {
       console.error(err);
